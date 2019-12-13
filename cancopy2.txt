@@ -1,0 +1,36 @@
+// exports.callFunc = function() {
+//     console.log("test module executed ");
+// };
+const client_id = '1000.JNFWMK9DMI217F7KUVSGG69Y0SM3AV';
+const client_secret = '7ff1d2d68ec5429976f3e88414236d51af13b0560b';
+var http = require('http');
+const express = require('express');
+const bodyParser = require('body-parser');
+var getUrlforAR = require('./getUrlForAR');
+var app = express();
+var scope = 'ZohoSubscriptions.fullaccess.all';
+ 
+/*http.createServer(function(req, res) {
+    res.writeHead(200, { 'Content-type': 'text/html' });
+    res.end("Testing for zoho api integration (subscription).");
+    
+})*/
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.get('/', function(req, res) {
+    var furl = getUrlforAR.giveUrlForAR(scope);
+    res.set('Content-type', 'text/plain');
+    res.send('access token post request with this url '+ furl);
+});
+const id = 'id';
+app.get('/user', function(req, res) {
+    var user_id = req.param('id');
+    res.set('Content-type', 'text/plain');
+    res.send('GET request to the user navigation with id: ' + user_id);
+});
+app.post('/user-1', function(req, res) {
+    const bod = req.body.Body;
+    res.set('Content-type', 'text/plain');
+    res.send('POST request to the user navigation with the code : ' + bod);
+});
+app.listen(8080);

@@ -1,0 +1,18 @@
+var exports = module.exports = {};
+
+
+exports.giveUrlForAR = function(scope) {
+    var clientData = require('./clientData.json');
+    var apiData = require('./apiData.json');
+    var tsturl = apiData.AccRef.baseUrl;
+
+    function encodeData(data) {
+        return Object.keys(data).map(function(key) {
+            return [key, data[key]].map(encodeURIComponent).join("=");
+        }).join("&");
+    }
+    var u = tsturl + '' + encodeData(clientData);
+    u = u.replace(/\r?\n|\r/g, '');
+    u = u + '&grant_type=authorization_code&scope=' + scope + '&state=t3st1ng';
+    return u;
+}
