@@ -52,11 +52,11 @@ exporter.pushDataIntoLeads = async function(data, callback) {
             //console.log(response.statusCode);
         if ((response.statusCode == 200) || (response.statusCode == 201)) {
             //console.log(response.body);
-            callback(res.data);
+            return res.data
         } else {
             console.log("error occured status code is " + response.statusCode);
             console.log(response.body)
-            callback(response.body);
+            return response.body
         }
     }
     //pushDataIntoLeads(data);
@@ -165,13 +165,13 @@ exporter.getCustomerByCompanyId = async function(cid) {
             }
             let res = await rpn(options)
                 //console.log(`status code : ${res.status}`);
-            if (res.data.code === 0) {
-                let data = (res.data.customers.length > 0) ? res.data.customers[0] : `data don't exist`;
+            if (res.body.code === 0) {
+                let data = (res.body.customers.length > 0) ? res.body.customers[0] : `data don't exist`;
                 //console.log(data);
                 return data;
             } else {
                 console.log(`following error encountered: ${res.data.message}`)
-                return res.data.message;
+                return res.body.message;
             }
 
         } catch (err) { console.error(err); }
@@ -201,7 +201,7 @@ exporter.convertLeadToAccountByCompanyId = async function(id) {
 
 //FUNCTION TO CREATE A SUBSCRIPTION
 
-exporter.createSub1 = async function(id, dt, callback) {
+exporter.createSub1 = async function(dt) {
     console.log("New Subscription creation request starting ")
     let acc = await exporter.getTokenFromDatabase();
     let conv = await exporter.convertLeadToAccountByCompanyId(dt.company_id);
@@ -240,11 +240,16 @@ exporter.createSub1 = async function(id, dt, callback) {
                 console.log(`code : ${resp.body.code}`)
                 console.log(`error: ${resp.body.message}`)
             }
-            callback(resp);
-            // return resp.data;
-        } catch (err) { console.error(err) }
-    } else
+            //callback(resp);
+            return resp.body;
+        } catch (err) {
+            console.error(err)
+            return err;
+        }
+    } else {
         console.log('everything didn\'t go as planned');
+        return -1;
+    }
 }
 
 exporter.onlyCreateSub = async function(id, dt, callback) {

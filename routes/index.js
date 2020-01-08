@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var functions = require('../functions')
-var ins = require('../notReallyMain')
+    //var ins = require('../notReallyMain')
 
 /* GET home page. */
 router.get('/', (req, res, next) => {
@@ -31,11 +31,18 @@ router.post('/somePostRequest', (req, res, next) => {
         //     if (resp.status == 201) { res.send(resp.data); } else
         //         res.send(resp.status);
         //   });
-        // functions.pushDataIntoLeads(data, (result) => {
-        //     console.log(result);
+        // functions.pushDataIntoLeads(req.body).then((resp) => {
+        //         res.send(resp);
+        //         console.log(resp);
+        //     })
+        // functions.createSub1(req.body).then((resp) => {
+        //     if (resp == -1) {
+        //         res.send('error occured')
+        //         return;
+        //     }
+        //     console.log(resp);
+        //     res.send(resp);
         // })
-    ins.getCustomerByCompanyId(req.body.id);
-
 })
 
 
