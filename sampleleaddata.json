@@ -1,70 +1,12 @@
 {
-
-    "data": [
-
-        {
-
-            "Owner": {
-
-                "name": "Aaryan Jain",
-
-                "id": "89522000000112013"
-
-            },
-
-            "Company": "Hill Estate Farms",
-            "Email": "hillestatefarms@gmail.com",
-            "$currency_symbol": "Rs.",
-            "Industry": "Agriculture",
-            "$converted": false,
-            "$process_flow": false,
-            "Street": "21, Bhilai Hills Area",
-            "Zip_Code": "490006",
-            "$approved": true,
-            "$editable": true,
-            "City": "Bhilai",
-            "No_of_Employees": 30,
-            "State": "Chhattisgarh",
-
-            "Country": "India",
-
-            "Annual_Revenue": null,
-            "Description": "Farm Estate Corporation for Bhilai Municipal Corporation",
-            "Rating": null,
-            "Website": "http://www.hillestatefarms.gov",
-            "Twitter": null,
-            "Salutation": "Mr.",
-            "First_Name": "Devendra",
-            "Lead_Status": "Contact in Future",
-            "Full_Name": "Mr. Devendra Yadav",
-            "Record_Image": null,
-            "Skype_ID": null,
-            "Phone": "8251912244",
-            "potential_users": 500,
-            "Email_Opt_Out": false,
-            "Designation": "Mayor",
-            "company_id": "5645641",
-            "Last_Name": "Yadav",
-            "Referrer": null,
-            "Lead_Source": null,
-            "Tag": [],
-            "Fax": null
-        },
-        {
-            "Company": "testt company",
-            "Industry": "Agriculture",
-            "Street": "12, SHYAMLA Hills Area",
-            "Zip_Code": "462001",
-            "City": "Bhopal",
-            "No_of_Employees": 30,
-            "State": "Madhya Pradesh",
-            "Country": "India",
-            "First_Name": "Testter",
-            "Full_Name": "Mr. Testter oflead",
-            "Phone": "8251912244",
-            "potential_users": 50,
-            "Designation": "Manager",
-            "Last_Name": "oflead"
-        }
-    ]
+    "data": [{
+        "Company": "test company thirteen",
+        "Industry": "Railways",
+        "Country": "India",
+        "First_Name": "Sanjay",
+        "Phone": "9876111111",
+        "Company_id": 1050204030,
+        "Potential_users": 95,
+        "Last_Name": "Baloney"
+    }]
 }
