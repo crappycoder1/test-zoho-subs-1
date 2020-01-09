@@ -170,7 +170,7 @@ exporter.getCustomerByCompanyId = async function(cid) {
                 //console.log(data);
                 return data;
             } else {
-                console.log(`following error encountered: ${res.data.message}`)
+                console.log(`following error encountered: ${res.body.message}`)
                 return res.body.message;
             }
 
@@ -350,8 +350,8 @@ exporter.checkForUnpaidInvoices = async function(cid) {
             if (res.body.code == 0) {
                 console.log(res.body);
             } else {
-                console.log(`code : ${res.data.code}`)
-                console.log(`error: ${res.data.message} but request was succesful`)
+                console.log(`code : ${res.body.code}`)
+                console.log(`error: ${res.body.message} but request was succesful`)
             }
 
         } catch (err) { console.error(err) }
