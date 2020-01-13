@@ -4,6 +4,7 @@ var functions = require('../functions')
     //var ins = require('../notReallyMain')
 
 /* GET home page. */
+//functions.getAccessTokenFromRefresh();
 router.get('/', (req, res, next) => {
     res.render('checkoutpage', {
         data: {},
@@ -40,9 +41,16 @@ router.post('/somePostRequest', (req, res, next) => {
         //         res.send('error occured')
         //         return;
         //     }
-        //     console.log(resp);
-        //     res.send(resp);
+        //     console.log(resp.body);
+        //     res.send(resp.body);
         // })
+        //     functions.checkForUnpaidInvoices(req.body.id).then((response) => {
+        //         console.log(`invoices overdue : ${response.body.invoices.length}`);
+        //         res.send(response.body.invoices);
+        //     }).catch((err) => {
+        //         console.error(err)
+        //         res.send(err);
+        //     })
 })
 
 

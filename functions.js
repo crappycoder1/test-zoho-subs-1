@@ -1,10 +1,6 @@
 // let grantCode = '';
 // const user_identifier = 'jaydev@smartsense.co.in';
 
-const idforcompanyidfield = 1788180000000071402;
-let data = require('./sampleleaddata.json')
-const querystring = require('querystring');
-const http = require('https');
 const rpn = require('request-promise-native');
 var crmclient = require('zcrmsdk');
 var exporter = function() {}
@@ -43,21 +39,21 @@ exporter.getAccessTokenFromRefresh = async function() {
     //setInterval(getAccessTokenFromRefresh(), 1000*60*55);
 
 // FUNCTION TO PUSH SOME DATA INTO LEADS
-exporter.pushDataIntoLeads = async function(data, callback) {
+exporter.pushDataIntoLeads = async function(data) {
         var input = {};
         input.module = `Leads`;
         input.body = data;
+        input.body.description = "Created during sign-up";
         let response = await crmclient.API.MODULES.post(input);
-        let res = JSON.parse(response.body)
-            //console.log(response.statusCode);
+        //console.log(response.statusCode);
         if ((response.statusCode == 200) || (response.statusCode == 201)) {
-            //console.log(response.body);
-            return res.data
+            console.log('success in lead creation')
+                //console.log(response.body);
         } else {
             console.log("error occured status code is " + response.statusCode);
             console.log(response.body)
-            return response.body
         }
+        return response;
     }
     //pushDataIntoLeads(data);
 
@@ -71,15 +67,52 @@ exporter.convertLeadByRecordId = async function(id) {
     let res = JSON.parse(response.body)
         // console.log(response.statusCode);
     if ((response.statusCode == 200) || (response.statusCode == 201)) {
+        console.log('success in lead conversion to account')
         console.log(res.data[0]);
-        return res.data[0];
     } else {
         console.log("error occured status code is " + response.statusCode);
         console.log(response.body)
-        return response.body;
     }
+    return response;
 }
 
+// FUNCTION TO GET A LEAD ACTIVITIES BY COMPANY ID
+exporter.getLeadActivityByCompanyId = async function(id) {
+    var params = {};
+    params.criteria = `(Company_id:equals:${id})`;
+
+    var input = {};
+    input.module = 'Leads';
+    input.params = params;
+    crmclient.API.MODULES.search(input).then((res) => {
+            if (res.statusCode != 200) {
+                console.log('error in getting leads');
+                return;
+            }
+            //console.log(JSON.parse(res.body));
+            let inp = {};
+            inp.module = 'activities'
+                //inp.id = JSON.parse(res.body).data[0].id;
+                //console.log(inp.id)
+            crmclient.API.MODULES.get(inp).then((data) => {
+                if (data.statusCode != 200) {
+                    console.log('error occured in getting activities')
+                    console.log(data);
+                    return;
+                }
+                console.log(JSON.parse(data.body).data[0]);
+                console.log(JSON.parse(data.body).data[1]);
+                console.log(JSON.parse(data.body).data[2]);
+                console.log(JSON.parse(data.body).data[3]);
+                console.log(JSON.parse(data.body).data[4]);
+                return data;
+            }).catch((error) => {
+                console.error(error)
+                return;
+            })
+        })
+        .catch(err => console.log(err));
+}
 
 // FUNCTION TO GET A LEAD BY COMPANY ID
 exporter.getLeadByCompanyId = async function(id) {
@@ -96,7 +129,7 @@ exporter.getLeadByCompanyId = async function(id) {
                 response_data = JSON.parse(response.body).data;
                 console.log(response_data);
             } else {
-                resp = JSON.parse(response)
+                console.log(`status code : ${response.statusCode}`)
                 console.log(response);
                 /* 
                         FOR FURTHER CHECKING WHAT ERROR (IN FUTURE)
@@ -124,17 +157,15 @@ exporter.getRecIdByCompanyId = async function(id) {
             if (response.statusCode == 200) {
                 response_data = JSON.parse(response.body).data[0].id;
                 console.log(response_data);
-                return response_data;
             } else {
-                let resp = JSON.parse(response)
+                console.log(`request failed with statusCode: ${response.statusCode}`)
                 console.log(response);
                 // console.log(resp.status_code,resp.message);
                 /* 
                         FOR FURTHER CHECKING WHAT ERROR (IN FUTURE)
                 */
-                return response.statusCode;
             }
-
+            return response;
         } catch (err) {
             console.error(err);
             return err;
@@ -165,15 +196,10 @@ exporter.getCustomerByCompanyId = async function(cid) {
             }
             let res = await rpn(options)
                 //console.log(`status code : ${res.status}`);
-            if (res.body.code === 0) {
-                let data = (res.body.customers.length > 0) ? res.body.customers[0] : `data don't exist`;
-                //console.log(data);
-                return data;
-            } else {
-                console.log(`following error encountered: ${res.body.message}`)
-                return res.body.message;
+            if (res.statusCode != 200) {
+                console.log(`errorAAAAAAAAAAAAAAA occoured with statuscode: ${res.statusCode}`);
             }
-
+            return res;
         } catch (err) { console.error(err); }
 
     }
@@ -183,17 +209,23 @@ exporter.getCustomerByCompanyId = async function(cid) {
 // FUNCTION TO CONVERT A LEAD USING COMPANY ID
 exporter.convertLeadToAccountByCompanyId = async function(id) {
         let result = await exporter.getRecIdByCompanyId(id);
-        if (result !== undefined) {
-            if (result.toString().length > 4) {
+        if (result.statusCode == 200) {
+            response_data = JSON.parse(result.body).data[0].id;
+            if (response_data) {
                 let sol = await exporter.convertLeadByRecordId(result);
-                console.log(sol);
-                return sol.Accounts;
+                if (sol.statusCode != 200 || sol.statusCode != 201) {
+                    console.log(`error occoured with status code = ${sol.statusCode}`)
+                    return 0;
+                }
+                let res = JSON.parse(sol.body).data[0]
+                console.log(res);
+                return res.Accounts;
             } else {
-                console.log(`some error occured with status code = ${resp}`)
+                console.log(`cannot find record pls exit`)
                 return 0;
             }
         } else {
-            console.log('error')
+            console.log(`error with statuscode : ${result.statusCode}`)
             return 0;
         }
     }
@@ -209,9 +241,10 @@ exporter.createSub1 = async function(dt) {
     let synced = await exporter.instantSync(conv);
     let customer = await exporter.getCustomerByCompanyId(dt.company_id);
     //console.log(customer)
-    if (conv != 0 && synced == true) {
+    if (conv != 0 && synced == true && customer.statusCode == 200) {
+        let cust = customer.body.customers.length != 0 ? JSON.parse(customer.body).customers[0] : `data dosen't exist`;
         let d = {};
-        d.customer_id = customer.customer_id;
+        d.customer_id = cust.customer_id;
         // d.email = dt.email;
         d.plan = dt.plan;
         d.auto_collect = false;
@@ -241,7 +274,7 @@ exporter.createSub1 = async function(dt) {
                 console.log(`error: ${resp.body.message}`)
             }
             //callback(resp);
-            return resp.body;
+            return resp;
         } catch (err) {
             console.error(err)
             return err;
@@ -257,7 +290,7 @@ exporter.onlyCreateSub = async function(id, dt, callback) {
     let acc = await exporter.getTokenFromDatabase();
     let customer = await exporter.getCustomerByCompanyId(dt.company_id);
     let d = {};
-    d.customer_id = customer.customer_id;
+    d.customer_id = customer.body.customers[0].customer_id;
     d.plan = dt.plan;
     d.auto_collect = false;
     // console.log(d);
@@ -324,15 +357,21 @@ exporter.instantSync = async function(zcrmaccid) {
     }
     //instantSync('3756897000001201002');
     // FUNCTION TO CHECK IF INVOICEs ARE UNPAID
+
 exporter.checkForUnpaidInvoices = async function(cid) {
         let acc = await exporter.getTokenFromDatabase();
         let customer = await exporter.getCustomerByCompanyId(cid);
+        if (customer.statusCode != 200 && customer.body.customers.length > 0) {
+            console.log(`erroraAAAAaaaaaabbbbbbbbbbbbbbbbbBBBBBBB occoured with statuscode: ${customer.statusCode}`);
+            return;
+        }
+
         var options = {
             method: 'GET',
             qs: {
                 'oauthscope': 'ZohoSubscriptions.invoices.READ',
-                'customer_id': customer.customer_id,
-                'filter_by': 'Status.All'
+                'customer_id': customer.body.customers[0].customer_id,
+                'filter_by': 'Status.OverDue'
             },
             url: `https://subscriptions.zoho.com/api/v1/invoices`,
             //console.log(url);
@@ -345,16 +384,23 @@ exporter.checkForUnpaidInvoices = async function(cid) {
             resolveWithFullResponse: true
         }
         try {
-
-            let res = rpn(options)
+            let res = await rpn(options)
+            if (res.statusCode != 200) {
+                console.log(`error occoured with statuscode: ${res.statusCode}`);
+                return res;
+            }
             if (res.body.code == 0) {
                 console.log(res.body);
+                console.log(`you have ${res.body.invoices.length} amount of invoices over due please pay them first`)
+                return res
             } else {
                 console.log(`code : ${res.body.code}`)
                 console.log(`error: ${res.body.message} but request was succesful`)
+                return res
             }
-
-        } catch (err) { console.error(err) }
+        } catch (err) {
+            console.error(err)
+        }
     }
     // checkForUnpaidInvoices(1500101010);
     //createSub(1500101010, plan, "HR");
